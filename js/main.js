@@ -4,12 +4,17 @@ var heroeHp = $("#heroe .hp");
 var heroeButton = $("#heroe .button");
 var heroeDamage = $("#heroe .damage");
 
+var actifHeroe;
+
 var monsterHp = $("#monster .hp");
 var monsterButton = $("#monster .button");
 var monsterDamage = $("#monster .damage");
 
+var actifMonster;
+
 var player;
 var firstTour = 1;
+
 
 
 /* heroe = 1  && monster = 0 */
@@ -31,12 +36,12 @@ function play() {
         heroeButton.addClass("disable")
         player = 0;
         /* function php */
-        getDamage(player, monsterHp.text(),heroeDamage.text());
+        getDamage($("#monster .name").text().toLowerCase(), monsterHp.text(),heroeDamage.text());
         if (ripost()) {
-            getDamage(1, heroeHp.text(), monsterDamage.text()/2)
+            getDamage($("#heroe .name").text().toLowerCase(), heroeHp.text(), monsterDamage.text()/2)
             $("#heroe img").addClass('blink');
             setTimeout('$("#heroe img").removeClass("blink")', 1000);
-        }
+        } 
         $("#monster img").addClass('blink');
         setTimeout('$("#monster img").removeClass("blink")', 1000);
         
@@ -45,9 +50,9 @@ function play() {
         monsterButton.addClass("disable")
         player = 1;
         /* function php */
-        getDamage(player, heroeHp.text(),monsterDamage.text());
+        getDamage($("#heroe .name").text().toLowerCase(), heroeHp.text(),monsterDamage.text());
         if (ripost()) {
-            getDamage(0, monsterHp.text(), heroeDamage.text()/2)
+            getDamage($("#monster .name").text().toLowerCase(), monsterHp.text(), heroeDamage.text()/2)
             $("#monster img").addClass('blink');
             setTimeout('$("#monster img").removeClass("blink")', 1000);
         }
@@ -90,7 +95,7 @@ function getDamage(playerCharacter, hp, damage) {
             'damage': damage
         }
     }).done(function(result) {
-        if (playerCharacter == 1) {
+        if (playerCharacter == $("#heroe .name").text().toLowerCase()) {
             heroeHp.text(result)
             if (result <= 0) {
                 $("#heroe img").addClass("lose")
@@ -112,6 +117,20 @@ function getDamage(playerCharacter, hp, damage) {
     })
 }
 
+function fight(heroe, monster) {
+    $.ajax({
+        method: 'post',
+        url: 'main.php',
+        data: {
+            'action': 'ajaxFight',
+            'heroe': heroe,
+            'monster': monster
+        }
+    }).done(function(result) {
+        window.location.href = result
+    })
+}
+
 chooseFirstPlayer()
 
 monsterButton.click(function(e) {
@@ -122,6 +141,26 @@ monsterButton.click(function(e) {
 heroeButton.click(function(e) {
     e.preventDefault();
     play()
+})
+
+$(".select-heroe").click(function(e) {
+    e.preventDefault();
+    $(this).removeClass("unselect")
+    heroeName = this.querySelector(".name")
+    actifHeroe = heroeName.textContent
+})
+
+$(".select-monster").click(function(e) {
+    e.preventDefault();
+    console.log(this)
+    $(this).removeClass("unselect")
+    monsterName = this.querySelector(".name")
+    actifMonster = monsterName.textContent
+})
+
+$("#fight").click(function(e) {
+    e.preventDefault();
+    fight(actifHeroe, actifMonster)
 })
 
 // INIT

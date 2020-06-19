@@ -1,9 +1,20 @@
 .row {
-    width: 80%;
     margin: 0;
     display: flex;
     flex-direction: row;
     justify-content: space-around;
+}
+
+.fight {
+    width: 80%;
+}
+
+.unselect {
+    filter: grayscale();
+}
+
+.unselect:hover {
+    filter: none;
 }
 
 .card .card-content {
@@ -30,7 +41,7 @@ h3, h4 {
     width: 30%;
 }
 
-.card-action a.button, #modal-cemetery a.button {
+.card-action a.button, #modal-cemetery a.button, a.button {
     display: block;
     text-align: center;
     background-color: firebrick;
@@ -43,7 +54,7 @@ h3, h4 {
     margin-right: 0!important;
 }
 
-.card-action a.button:hover, #modal-cemetery a.button:hover {
+.card-action a.button:hover, #modal-cemetery a.button:hover, a.button:hover {
     background-color: #b95e5e;
 }
 

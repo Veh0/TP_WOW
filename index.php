@@ -17,70 +17,43 @@
 <body>
     <?php include_once('main.php'); ?>
 
-    <a class="waves-effect waves-light btn grey darken-3 modal-trigger" href="#modal-cemetery">Cemetery</a>
+    <div class="container">
 
-    <div id="modal-cemetery" class="modal">
-        <div class="modal-content">
-            <h4>Cemetery</h4>
-            <div id="cemetery">
-                
-            </div>
-        </div>
-            <div class="modal-footer">
-            <a href="#!" class="modal-close button">close</a>
-        </div>
-    </div>
-
-    <div id="container" class="row">
-    
-            <div id="heroe" class="col s3">
-                <div class="card">
-                    <div class="card-image">
-                        <img src="img/Uther.webp" alt="Uther">
-                    </div>
-                    <div class="card-content">
-                        <h3 class="name"><?php echo $heroe -> name ?></h3>
-                        <h4 class="hp"><?php echo $heroe -> hp ?></h4>
-                    
-                    <ul>
-                        <li><b>Sword:</b></li>
-                        <li>name:  <?php echo $heroe -> weapon -> name; ?></li>
-                        <li>damage:  <span class="damage"><?php echo $heroe -> weapon -> damage; ?></span></li>
-                        <li>height:  <?php echo $heroe -> weapon -> height; ?>cm</li>
-                        <li>weight:  <?php echo $heroe -> weapon -> weight; ?>g</li>
-                    </ul>
-                    </div>
-                        <div class="card-action">
-                        <a class="button" href="">Attack !</a>
+        <h2>HEROES</h2>
+        <hr>
+        <div class="row" id="heroes">
+            <?php foreach ($heroes as $heroe) { ?>
+                <div class="unselect select-heroe col s8">
+                    <div class="card">
+                        <div class="card-image">
+                            <img src="<?php echo('img/'.$heroe->name.'.webp') ?>" alt=<?php echo $heroe->name ?>>
+                        </div>
+                        <div class="card-content">
+                            <h3 style="text-align: center" class="name"><?php echo $heroe->name ?></h3>
+                        </div>
                     </div>
                 </div>
-            </div>
+            <?php } ?>
+        </div>
 
-
-            <div id="monster" class="col s3">
-                <div class="card">
-                    <div class="card-image">
-                        <img src="img/Thrall.webp" alt="Thrall">
-                    </div>
-                    <div class="card-content">
-                        <h3 class="name"><?php echo $monster -> name ?></h3>
-                        <h4 class="hp"><?php echo $monster -> hp ?></h4>
-                        
-                    <ul>
-                        <li><b>Sword:</b></li>
-                        <li>name:  <?php echo $monster -> weapon -> name; ?></li>
-                        <li>damage:  <span class="damage"><?php echo $monster -> weapon -> damage; ?></span></li>
-                        <li>height:  <?php echo $monster -> weapon -> height; ?>cm</li>
-                        <li>weight:  <?php echo $monster -> weapon -> weight; ?>g</li>
-                    </ul>
-                    </div>
-                        <div class="card-action">
-                        <a class="button" href="">Attack !</a>
+        <h2>MONSTERS</h2>
+        <hr>
+        <div class="row" id="monsters">
+            <?php foreach ($monsters as $monster) { ?>
+                <div class="unselect select-monster col s8">
+                    <div class="card">
+                        <div class="card-image">
+                            <img src="<?php echo('img/'.$monster->name.'.webp') ?>" alt=<?php echo $monster->name ?>>
+                        </div>
+                        <div class="card-content">
+                            <h3 style="text-align: center" class="name"><?php echo $monster->name ?></h3>
+                        </div>
                     </div>
                 </div>
-            </div>
+            <?php } ?>
+        </div>
 
-
+        <a href="fight.php" id="fight" class="button">Fight !</a>
     </div>
 
 </body>
