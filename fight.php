@@ -20,8 +20,8 @@
         $heroe = $GLOBALS[$_GET['heroe']];
         $monster = $GLOBALS[$_GET['monster']];
     ?>
-
-    <a class="waves-effect waves-light btn grey darken-3 modal-trigger" href="#modal-cemetery">Cemetery</a>
+    <a href="index.php" class="button" style="width:10%; margin:0;">Back</a>
+    <a class="waves-effect waves-light button grey darken-3 modal-trigger" href="#modal-cemetery">Cemetery</a>
 
     <div id="modal-cemetery" class="modal">
         <div class="modal-content">
@@ -34,6 +34,8 @@
             <a href="#!" class="modal-close button">close</a>
         </div>
     </div>
+
+    
 
     <div class="container row fight">
     
