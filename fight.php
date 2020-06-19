@@ -20,26 +20,13 @@
         $heroe = $GLOBALS[$_GET['heroe']];
         $monster = $GLOBALS[$_GET['monster']];
     ?>
+
     <a href="index.php" class="button" style="width:10%; margin:0;">Back</a>
-    <a class="waves-effect waves-light button grey darken-3 modal-trigger" href="#modal-cemetery">Cemetery</a>
-
-    <div id="modal-cemetery" class="modal">
-        <div class="modal-content">
-            <h4>Cemetery</h4>
-            <div id="cemetery">
-                
-            </div>
-        </div>
-            <div class="modal-footer">
-            <a href="#!" class="modal-close button">close</a>
-        </div>
-    </div>
-
     
 
     <div class="container row fight">
     
-            <div id="heroe" class="col s4">
+            <div id="heroe" class="col s3">
                 <div class="card">
                     <div class="card-image">
                         <img src="<?php echo('img/'.$heroe->name.'.webp') ?>" alt=<?php echo $heroe->name ?>>
@@ -63,7 +50,7 @@
             </div>
 
 
-            <div id="monster" class="col s4">
+            <div id="monster" class="col s3">
                 <div class="card">
                     <div class="card-image">
                     <img src="<?php echo('img/'.$monster->name.'.webp') ?>" alt=<?php echo $monster->name ?>>
@@ -86,8 +73,22 @@
                 </div>
             </div>
 
-
+            
     </div>
+    
+    <a class="waves-effect waves-light button grey darken-3 modal-trigger" href="#modal-cemetery">Cemetery</a>
+
+            <div id="modal-cemetery" class="modal">
+                <div class="modal-content">
+                    <h4>Cemetery</h4>
+                    <div id="cemetery">
+                        
+                    </div>
+                </div>
+                    <div class="modal-footer">
+                    <a href="#!" class="modal-close button">close</a>
+                </div>
+            </div>
 
 </body>
 
