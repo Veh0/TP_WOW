@@ -1,0 +1,70 @@
+.row {
+    width: 80%;
+    margin: 0;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+}
+
+.card .card-content {
+    padding: 10px;
+}
+
+h3, h4 {
+    margin-block-start: 0;
+    margin-block-end: 0;
+}
+
+#modal-cemetery #cemetery {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+#modal-cemetery h4 {
+    border-bottom: solid 1px;
+    margin-bottom: 2%;
+}
+
+#cemetery img {
+    width: 30%;
+}
+
+.card-action a.button, #modal-cemetery a.button {
+    display: block;
+    text-align: center;
+    background-color: firebrick;
+    border-radius: 25px ;
+    color: white!important;
+    font-weight: bolder;
+    padding: 1%;
+    text-decoration: none;
+    margin: 0 auto;
+    margin-right: 0!important;
+}
+
+.card-action a.button:hover, #modal-cemetery a.button:hover {
+    background-color: #b95e5e;
+}
+
+.card-action a.button.disable {
+    background-color: #b95e5e;
+    pointer-events: none;
+}
+
+.lose {
+    filter: grayscale();
+}
+
+/* ANIMATIONS */
+
+.blink {
+    animation-name: blinky;
+    animation-duration: 0.25s;
+    animation-iteration-count: infinite;  
+}
+
+@keyframes blinky {
+    from { filter: none; }
+    to { filter: grayscale(); } 
+}
