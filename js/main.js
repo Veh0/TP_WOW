@@ -138,12 +138,12 @@ function getDamage(playerCharacter, hp, damage, stamina, defense) {
 
     let playerItems = []
     if (playerCharacter == heroeName) {
-        let select = document.querySelectorAll('.select-heroe-item img')
+        let select = document.querySelectorAll('.fight-heroe-item img')
         select.forEach(element => {
             playerItems.push({ [element.dataset.type] : element.name})
         });
     } else {
-        let select = document.querySelectorAll('.select-monster-item img')
+        let select = document.querySelectorAll('.fight-monster-item img')
         select.forEach(element => {
             playerItems.push({ [element.dataset.type] : element.name})
         });
@@ -196,12 +196,12 @@ function getDamage(playerCharacter, hp, damage, stamina, defense) {
 function attack(playerCharacter, stamina) {
     let playerItems = []
     if (playerCharacter == heroeName) {
-        let select = document.querySelectorAll('.select-heroe-item img')
+        let select = document.querySelectorAll('.fight-heroe-item img')
         select.forEach(element => {
             playerItems.push({ [element.dataset.type] : element.name})
         });
     } else {
-        let select = document.querySelectorAll('.select-monster-item img')
+        let select = document.querySelectorAll('.fight-monster-item img')
         select.forEach(element => {
             playerItems.push({ [element.dataset.type] : element.name})
         });
@@ -231,12 +231,12 @@ function eat(playerCharacter, stamina) {
     
     let playerItems = []
     if (playerCharacter == heroeName) {
-        let select = document.querySelectorAll('.select-heroe-item img')
+        let select = document.querySelectorAll('.fight-heroe-item img')
         select.forEach(element => {
             playerItems.push({ [element.dataset.type] : element.name})
         });
     } else {
-        let select = document.querySelectorAll('.select-monster-item img')
+        let select = document.querySelectorAll('.fight-monster-item img')
         select.forEach(element => {
             playerItems.push({ [element.dataset.type] : element.name})
         });
@@ -262,6 +262,45 @@ function eat(playerCharacter, stamina) {
     })
 }
 
+function changeItem(playerCharacter, type, item) {
+    let playerItems = []
+    if (playerCharacter == heroeName) {
+        let select = document.querySelectorAll('.fight-heroe-item img')
+        select.forEach(element => {
+            playerItems.push({ [element.dataset.type] : element.name})
+        });
+    } else {
+        let select = document.querySelectorAll('.fight-monster-item img')
+        select.forEach(element => {
+            playerItems.push({ [element.dataset.type] : element.name})
+        });
+    }
+
+    var data = {
+        'action': 'ajaxChangeItem',
+        'player': playerCharacter,
+        'playerItems': JSON.stringify(playerItems),
+        'type': type,
+        'item': item
+    }
+
+    $.ajax({
+        method: 'post',
+        url: 'main.php',
+        data: data
+    }).done(function(result) {
+        result = JSON.parse(result)
+        if (type == "weapon") {
+            if (playerCharacter == heroeName) {
+                $("#heroe .weaponName").text(result["name"])
+                $("#heroe .damage").text(result["damage"])
+            } else {
+                $("#monster .weaponName").text(result["name"])
+                $("#monster .damage").text(result["damage"])
+            }
+        }
+    })
+}
 
 // chooseFirstPlayer()
 
@@ -368,12 +407,8 @@ $("#fight button").click(function(e) {
         M.toast({html: "Your Monster doesn't have weapon", displayLength: 1000})
     } else {
         $("#fight input[name='heroe']").val(actifHeroe)
-        $("#fight input[name='heroeHp']").val(heroeHp.text())
-        $("#fight input[name='heroeStamina']").val(heroeStamina.text())
         $("#fight input[name='heroeItems']").val(JSON.stringify(heroeItems))
         $("#fight input[name='monster']").val(actifMonster)
-        $("#fight input[name='monsterHp']").val(monsterHp.text())
-        $("#fight input[name='monsterStamina']").val(monsterStamina.text())
         $("#fight input[name='monsterItems']").val(JSON.stringify(monsterItems))
         $("#fight").submit()
     }
@@ -383,6 +418,28 @@ $("#fight button").click(function(e) {
 $("#playBtn").click(function(e) {
     e.preventDefault();
     play()
+})
+
+$(".fight-heroe-item").click(function(e) {
+    e.preventDefault();
+
+    let item = this.querySelector("img")
+    let itemName = item.name
+    let itemType = item.dataset.type
+
+    console.log(item)
+
+    changeItem(heroeName, itemType, itemName)
+})
+
+$(".fight-monster-item").click(function(e) {
+    e.preventDefault();
+
+    let item = this.querySelector("img")
+    let itemName = item.name
+    let itemType = item.dataset.type
+
+    changeItem(monsterName, itemType, itemName)
 })
 
 // INIT

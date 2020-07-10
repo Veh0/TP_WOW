@@ -44,16 +44,14 @@
                         <h4>Mana: <span class="stamina"><?php echo $heroe -> stamina ?></span></h4>
                     <ul>
                         <li><b>Sword:</b></li>
-                        <li>name:  <?php echo $heroe -> weapon -> name; ?></li>
+                        <li>name:  <span class="weaponName"><?php echo $heroe -> weapon -> name; ?></span></li>
                         <li>damage:  <span class="damage"><?php echo $heroe -> weapon -> damage; ?></span></li>
-                        <li>height:  <?php echo $heroe -> weapon -> height; ?>cm</li>
-                        <li>weight:  <?php echo $heroe -> weapon -> weight; ?>g</li>
                     </ul>
                     </div>
                     <div class="card-action">
                     <div class="row">
                         <?php foreach ($heroe->inventory as $key => $value) { ?>
-                            <div class="col s3 select-heroe-item">
+                            <div class="col s3 fight-heroe-item">
                                 <?php switch(key($value)) { 
                                     case 'weapon': 
                                         $weapon = $GLOBALS[strtolower($value["weapon"])]; ?>
@@ -93,16 +91,14 @@
                         <h4>Mana: <span class="stamina"><?php echo $monster -> stamina ?></span></h4>
                     <ul>
                         <li><b>Sword:</b></li>
-                        <li>name:  <?php echo $monster -> weapon -> name; ?></li>
+                        <li>name:  <span class="weaponName"><?php echo $monster -> weapon -> name; ?></span></li>
                         <li>damage:  <span class="damage"><?php echo $monster -> weapon -> damage; ?></span></li>
-                        <li>height:  <?php echo $monster -> weapon -> height; ?>cm</li>
-                        <li>weight:  <?php echo $monster -> weapon -> weight; ?>g</li>
                     </ul>
                     </div>
                     <div class="card-action">
                         <div class="row">
                         <?php foreach ($monster->inventory as $key => $value) { ?>
-                            <div class="col s3 select-monster-item">
+                            <div class="col s3 fight-monster-item">
                                 <?php switch(key($value)) { 
                                     case 'weapon': 
                                         $weapon = $GLOBALS[strtolower($value["weapon"])]; ?>

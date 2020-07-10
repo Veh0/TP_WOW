@@ -25,6 +25,8 @@ if(isset($_POST['action']) && !empty($_POST['action'])) {
         case 'ajaxPlayerDeath' : 
             ajaxPlayerDeath($player);
         break;
+        case 'ajaxChangeItem':
+            ajaxChangeItem($player, $_POST['type'], $_POST['item']);
         // ...etc...
     }
 }
@@ -68,6 +70,33 @@ function ajaxGetDamage($character, $hp, $damage, $stamina, $defense) {
 
 function ajaxPlayerDeath($character) {
     echo $character->getName();
+}
+
+function ajaxChangeItem($character, $type, $item) {
+
+    switch ($type) {
+        case 'weapon':
+            # code...
+            $tab = [];
+            $weapon = $GLOBALS[strtolower($item)];
+            $character->setWeapon($weapon);
+            $tab["name"] = $weapon->getName();
+            $tab["damage"] = $weapon->getDamage();
+            echo json_encode($tab);
+        break;
+        case 'shield':
+            # code...
+            $shield = $GLOBALS[strtolower($item)];
+            $character->setShield($shield);
+        break;
+        case 'food':
+            # code...
+            $food = $GLOBALS[strtolower($item)];
+            $character->setFood($food);
+        break;
+    }
+
+    
 }
 
 function fight($player, $playerItems) {
