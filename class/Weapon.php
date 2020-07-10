@@ -2,8 +2,7 @@
 
 abstract class Weapon {
 
-    public function __construct($name, $damage, $height, $weight)
-    {
+    public function __construct($name, $damage, $height, $weight) {
         $this->name = $name;
         $this->damage = $damage;
         $this->height = $height;
