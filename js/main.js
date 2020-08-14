@@ -100,7 +100,15 @@ function ripost() {
 }
 
 function playerDeath(playerCharacter) {
-    $.ajax({
+    
+    var coord
+    if (playerCharacter == heroeName) {
+        coord = heroeCoord
+    } else {
+        coord = monsterCoord
+    }
+    
+    return $.ajax({
         method: 'post',
         url: 'main.php',
         data: {
@@ -109,6 +117,12 @@ function playerDeath(playerCharacter) {
         }
     }).done(function(result) {
         $('#cemetery').append("<img class='lose' src='img/"+result+".webp' alt='"+result+"'>")
+        for (let index = 0; index < bg.length; index++) {
+            const element = bg[index];
+            if ((typeof element.dataset.posx !== 'undefined' && element.dataset.posx == coord[0]) && (typeof element.dataset.posy !== 'undefined' && element.dataset.posy == coord[1])) {
+                element.removeChild(element.childNodes[1])
+            }
+        }
     })
 }
 
