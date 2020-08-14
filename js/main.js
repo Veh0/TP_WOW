@@ -222,22 +222,29 @@ function getDamage(playerCharacter) {
             setTimeout('$("#heroe img").removeClass("blink")', 1000)
             if (result["hp"] <= 0) {
                 $("#heroe img").addClass("lose")
-                heroeButton.addClass("disable")
-                monsterButton.addClass("disable")
+                $("#monster .button").addClass("disable")
+                $("#heroe .button").addClass("disable")
                 playerDeath(playerCharacter)
-                alert($("#monster .name").text()+" Win !")
+                alert(monsterName + " Win !")
             }
         } else {
             monsterHp.text(result["hp"])
+            monsterStamina.text(result["stamina"])
             $("#monster img").addClass('blink');
             setTimeout('$("#monster img").removeClass("blink")', 1000)
             if (result["hp"] <= 0) {
                 $("#monster img").addClass("lose")
-                heroeButton.addClass("disable")
-                monsterButton.addClass("disable")
+                $("#heroe .button").addClass("disable")
+                $("#monster .button").addClass("disable")
                 playerDeath(playerCharacter)
-                alert($("#heroe .name").text()+" Win !")
+                alert(heroeName + " Win !")
             }
+        }
+
+        if (result["error"] == 1) {
+            M.toast({html: playerCharacter + " is too exhaustive to protect himself", displayLength: 2000})
+        } else {
+            M.toast({html: playerCharacter + " hold his shield to protect himself", displayLength: 2000})
         }
     })
 }
@@ -261,6 +268,8 @@ function attack(playerCharacter) {
             'action': 'ajaxAttack',
             'player': playerCharacter,
             'playerItems': JSON.stringify(playerItems),
+            'coord': coord,
+            'enemyCoord': enemyCoord,
             'stamina' : stamina
         }
 
@@ -270,12 +279,23 @@ function attack(playerCharacter) {
         data: data
     }).done(function (result) {
         result = JSON.parse(result)
+        console.log(result)
         var error = result["error"]
         var stamina = result["stamina"]
         if (playerCharacter == heroeName) {
             heroeStamina.text(stamina)
         } else {
             monsterStamina.text(stamina)
+        } 
+
+        if (error == 0) {
+            getDamage(enemy)
+            M.toast({html: playerCharacter + " attack his ennemy", displayLength: 2000})
+            changePlayer()
+        } else if(error == 1) {
+            M.toast({html: playerCharacter + " is too far to attack", displayLength: 2000})
+        } else if(error == 2) {
+            M.toast({html: playerCharacter + " is too exhaustive to attack", displayLength: 2000})
         }
     })
 }
@@ -308,7 +328,7 @@ function eat(playerCharacter, stamina) {
         }
 
         if (error == 1) {
-            M.toast({html: "You are full of energy", displayLength: 2000})
+            M.toast({html: playerCharacter + " is full of energy", displayLength: 2000})
         } else {
             changePlayer()
         }
@@ -345,15 +365,15 @@ function sleep(playerCharacter, stamina, hp) {
         }
 
         if (error == 1) {
-            M.toast({html: "You are full of energy", displayLength: 2000})
+            M.toast({html: playerCharacter + " is full of energy", displayLength: 2000})
         }
 
         if (error == 2) {
-            M.toast({html: "You are totally cured", displayLength: 2000})
+            M.toast({html: playerCharacter + " is totally cured", displayLength: 2000})
         }
 
         if (error == 3) {
-            M.toast({html: "You are totally cured, you wake up", displayLength: 2000})
+            M.toast({html: playerCharacter + " is totally cured, he wakes up", displayLength: 2000})
         }
 
         
@@ -437,7 +457,7 @@ function run(playerCharacter) {
         }
 
         if(error == 1) {
-            M.toast({html: "You are completly exhaustive", displayLength: 2000})
+            M.toast({html: playerCharacter + " is completly exhaustive", displayLength: 2000})
         } 
     })
 }

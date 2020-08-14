@@ -177,7 +177,7 @@ abstract class Character {
             $damage = $damage - $damageReduce;
         }
         $stamina = $this->getStamina();
-        $this->getShield() == "No shield" ? $stamina = $stamina : $this->setStamina(round($stamina - $this->shield->getWeight()/(100 * $this->getStrength()), 1)); 
+        if($this->getShield() != "No shield") $this->setStamina(round($stamina - $this->shield->getWeight()/(100 * $this->getStrength()), 1)); 
         $this->getDamage($damage);
     }
 

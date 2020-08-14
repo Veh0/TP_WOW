@@ -36,8 +36,8 @@ $mjolnir = new Club("Mjolnir", 14, 95, 1500);
 $weapons = [$lightbringer, $doomhammer, $excalibur, $mjolnir];
 
 // SHIELD
-$ecu = new Shield("Ecu", 20, 450);
-$rempart = new Shield("Rempart", 35, 600);
+$ecu = new Shield("Ecu", 20, 900);
+$rempart = new Shield("Rempart", 35, 1200);
 
 $shields = [$rempart, $ecu];
 

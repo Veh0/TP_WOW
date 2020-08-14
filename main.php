@@ -17,7 +17,7 @@ if(isset($_POST['action']) && !empty($_POST['action'])) {
             ajaxGetDamage($player, $_POST['hp'],$_POST['damage'], $_POST['stamina']);
         break;
         case 'ajaxAttack':
-            ajaxAttack($player, $_POST['stamina']);
+            ajaxAttack($player, $_POST['stamina'], $_POST["coord"], $_POST["enemyCoord"]);
         break;
         case 'ajaxEat':
             ajaxEat($player, $_POST['stamina']);
@@ -86,13 +86,25 @@ function ajaxSleep($character, $stamina, $hp) {
     echo json_encode($tab);
 }
 
-function ajaxAttack($character, $stamina) {
+function ajaxAttack($character, $stamina, $coord, $enemyCoord) {
     $character->setStamina($stamina);
 
-    
-    $character->attack();
+    if((intval($coord[0]) == intval($enemyCoord[0]) && (intval($coord[1]) == intval($enemyCoord[1]) - 1 || intval($coord[1]) == intval($enemyCoord[1]) + 1)) || (intval($coord[1]) == intval($enemyCoord[1]) && (intval($coord[0]) == intval($enemyCoord[0]) - 1 || intval($coord[0]) == intval($enemyCoord[0]) + 1))) {
+        # code...
+        $character->attack();
+        $tab["error"] = 0;
+    } else {
+        $tab["error"] = 1;
+        $character->setStamina($stamina);
+    }
 
-    echo $character->getStamina();
+    if($character->getStamina() < 0) {
+        $character->setStamina($stamina);
+        $tab["error"] = 2;
+    }
+    $tab["stamina"] = $character->getStamina();
+
+    echo json_encode($tab);
 }
 
 function ajaxMove($character, $enemy, $enemyCoord, $originCoord, $direction, $stamina) {
@@ -211,6 +223,8 @@ function ajaxGetDamage($character, $hp, $damage, $stamina) {
 
     # code...
     $character->defense($damage);
+
+    var_dump($character->getShield()->getWeight());
 
     $tab["error"] = 0;
 
