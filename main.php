@@ -224,8 +224,6 @@ function ajaxGetDamage($character, $hp, $damage, $stamina) {
     # code...
     $character->defense($damage);
 
-    var_dump($character->getShield()->getWeight());
-
     $tab["error"] = 0;
 
     if($character->getStamina() < 0) {

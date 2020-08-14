@@ -88,79 +88,7 @@ function changePlayer() {
 }
 
 // PLAYERS ACTIONS
-function play() {
 
-    let firstPlayer = chooseFirstPlayer();
-
-    /*
-
-    1 = J1 attaque J2, J2 se défend contre J1
-                        OU
-        J2 attaque J1, J1 se défend contre J2 
-
-    2 = J1 mange, J2 attaque J1 
-                  OU
-        J2 attaque J1, J1 mange 
-
-    3 = J1 mange, J2 mange 
-
-    */
-   let action = Math.floor(Math.random() * 3) + 1;
-
-    switch (action) {
-        case 1:
-            if (firstPlayer == 1) {
-                if(parseFloat(heroeStamina.text()) > 0) { 
-                    attack(heroeName, heroeStamina.text())
-                    getDamage(monsterName, monsterHp.text(), heroeDamage.text(), monsterStamina.text(), true)
-                } else {
-                    M.toast({html: heroeName+' : Je n\'ai pas assez d\'énergie', displayLength: 2000})
-                }
-            } else {
-                if(parseFloat(monsterStamina.text()) > 0) { 
-                    attack(monsterName, monsterStamina.text())
-                    getDamage(heroeName, heroeHp.text(), monsterDamage.text(), heroeStamina.text(), true)
-                } else {
-                    M.toast({html: monsterName+' : Je n\'ai pas assez d\'énergie', displayLength: 2000})
-                }
-            }
-        break;
-    
-        case 2:
-            if (firstPlayer == 1) {
-                eat(heroeName, heroeStamina.text())
-                M.toast({html: heroeName+' mange', displayLength: 2000})
-                
-                if(parseFloat(monsterStamina.text()) > 0) {
-                    attack(monsterName, monsterStamina.text())
-                    getDamage(heroeName, heroeHp.text(), monsterDamage.text(), heroeStamina.text(), false)
-                    M.toast({html: monsterName+' inflige des dégats à '+heroeName, displayLength: 2000})
-                } else {
-                    M.toast({html: monsterName+' : Je n\'ai pas assez d\'énergie', displayLength: 2000})
-                }
-                
-            } else {
-                eat(monsterName, monsterStamina.text())
-                M.toast({html: monsterName+' mange', displayLength: 2000})
-                if(parseFloat(heroeStamina.text()) > 0) {
-                    attack(heroeName, heroeStamina.text())
-                    getDamage(monsterName, monsterHp.text(), monsterDamage.text(), monsterStamina.text(), false)
-                    M.toast({html: heroeName+' inflige des dégats à '+monsterName, displayLength: 2000})
-                } else {
-                    M.toast({html: heroeName+' : Je n\'ai pas assez d\'énergie', displayLength: 2000})
-                }
-                
-            }
-        break;
-
-        case 3:
-            eat(heroeName, heroeStamina.text())
-            eat(monsterName, monsterStamina.text())
-            M.toast({html: heroeName+' et '+monsterName+' s\'assoient et mangent', displayLength: 700})
-        break;
-    }
-
-}
 
 function ripost() {
     let ripost = Math.floor(Math.random() * 4);
@@ -221,6 +149,7 @@ function getDamage(playerCharacter) {
             $("#heroe img").addClass('blink');
             setTimeout('$("#heroe img").removeClass("blink")', 1000)
             if (result["hp"] <= 0) {
+                heroeHp.text("0")
                 $("#heroe img").addClass("lose")
                 $("#monster .button").addClass("disable")
                 $("#heroe .button").addClass("disable")
@@ -233,6 +162,7 @@ function getDamage(playerCharacter) {
             $("#monster img").addClass('blink');
             setTimeout('$("#monster img").removeClass("blink")', 1000)
             if (result["hp"] <= 0) {
+                monsterHp.text(0)
                 $("#monster img").addClass("lose")
                 $("#heroe .button").addClass("disable")
                 $("#monster .button").addClass("disable")
@@ -491,7 +421,6 @@ function move(playerCharacter, direction) {
         'enemyCoord': enemyCoord
     }
 
-    console.log(data)
 
     return $.ajax({
         method: 'post',
@@ -558,7 +487,6 @@ function getItems(playerCharacter) {
         var items = $('.fight-monster-item img')
     }
 
-    console.log(items)
 
     for (let index = 0; index < items.length; index++) {
         const element = items[index];
@@ -836,4 +764,77 @@ $(document).ready(function(){
         $("#heroe img").addClass('blink');
         setTimeout('$("#heroe img").removeClass("blink")', 1000);       
     }
+} */
+
+/*function play() {
+
+    let firstPlayer = chooseFirstPlayer();
+
+    /*
+
+    1 = J1 attaque J2, J2 se défend contre J1
+                        OU
+        J2 attaque J1, J1 se défend contre J2 
+
+    2 = J1 mange, J2 attaque J1 
+                  OU
+        J2 attaque J1, J1 mange 
+
+    3 = J1 mange, J2 mange 
+
+   let action = Math.floor(Math.random() * 3) + 1;
+
+    switch (action) {
+        case 1:
+            if (firstPlayer == 1) {
+                if(parseFloat(heroeStamina.text()) > 0) { 
+                    attack(heroeName, heroeStamina.text())
+                    getDamage(monsterName, monsterHp.text(), heroeDamage.text(), monsterStamina.text(), true)
+                } else {
+                    M.toast({html: heroeName+' : Je n\'ai pas assez d\'énergie', displayLength: 2000})
+                }
+            } else {
+                if(parseFloat(monsterStamina.text()) > 0) { 
+                    attack(monsterName, monsterStamina.text())
+                    getDamage(heroeName, heroeHp.text(), monsterDamage.text(), heroeStamina.text(), true)
+                } else {
+                    M.toast({html: monsterName+' : Je n\'ai pas assez d\'énergie', displayLength: 2000})
+                }
+            }
+        break;
+    
+        case 2:
+            if (firstPlayer == 1) {
+                eat(heroeName, heroeStamina.text())
+                M.toast({html: heroeName+' mange', displayLength: 2000})
+                
+                if(parseFloat(monsterStamina.text()) > 0) {
+                    attack(monsterName, monsterStamina.text())
+                    getDamage(heroeName, heroeHp.text(), monsterDamage.text(), heroeStamina.text(), false)
+                    M.toast({html: monsterName+' inflige des dégats à '+heroeName, displayLength: 2000})
+                } else {
+                    M.toast({html: monsterName+' : Je n\'ai pas assez d\'énergie', displayLength: 2000})
+                }
+                
+            } else {
+                eat(monsterName, monsterStamina.text())
+                M.toast({html: monsterName+' mange', displayLength: 2000})
+                if(parseFloat(heroeStamina.text()) > 0) {
+                    attack(heroeName, heroeStamina.text())
+                    getDamage(monsterName, monsterHp.text(), monsterDamage.text(), monsterStamina.text(), false)
+                    M.toast({html: heroeName+' inflige des dégats à '+monsterName, displayLength: 2000})
+                } else {
+                    M.toast({html: heroeName+' : Je n\'ai pas assez d\'énergie', displayLength: 2000})
+                }
+                
+            }
+        break;
+
+        case 3:
+            eat(heroeName, heroeStamina.text())
+            eat(monsterName, monsterStamina.text())
+            M.toast({html: heroeName+' et '+monsterName+' s\'assoient et mangent', displayLength: 700})
+        break;
+    }
+
 } */
