@@ -1,5 +1,5 @@
 .row {
-    margin: 0;
+    margin: 2% auto;
     display: flex;
     flex-direction: row;
     justify-content: space-around;
@@ -41,7 +41,7 @@ h3, h4 {
     width: 30%;
 }
 
-.card-action a.button, #modal-cemetery a.button, a.button {
+.card-action a.button, #modal-cemetery a.button, a.button, .button {
     display: block;
     text-align: center;
     background-color: firebrick;
@@ -56,9 +56,10 @@ h3, h4 {
 
 .card-action a.button:hover, #modal-cemetery a.button:hover, a.button:hover {
     background-color: #b95e5e;
+    cursor: pointer;
 }
 
-.card-action a.button.disable {
+.card-action a.button.disable, .button.disable {
     background-color: #b95e5e;
     pointer-events: none;
 }
@@ -66,6 +67,43 @@ h3, h4 {
 .lose {
     filter: grayscale();
 }
+
+table {
+    width: 90%;
+    margin: 0 auto 2%;
+}
+
+td {
+    width: 9.1%;
+    border: 1px solid rgba(0, 0, 0, 12);
+    position: relative;
+    padding: 0;
+  }
+  td:after {
+    content: '';
+    display: block;
+    margin-top: 100%;
+  }
+  td .content {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    text-align: center;
+    margin-top: 40%;
+    font-weight: bolder;
+  }
+
+  tr td:first-child, tr:last-child td {
+      background-color: firebrick;
+      color: white;
+  }
+  
+  span.activator {
+      margin-top: 7%;
+      cursor: pointer;
+  }
 
 /* ANIMATIONS */
 

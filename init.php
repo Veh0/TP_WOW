@@ -8,21 +8,21 @@ include("class/Monster.php");
 include("class/Club.php");
 
 // HEROES
-$uther = new Heroe("Uther", 110, 90);
+$uther = new Heroe("Uther", 110, 90, 20);
 
-$jaina = new Heroe("Jaina", 95, 100);
+$jaina = new Heroe("Jaina", 95, 100, 12);
 
-$sonya = new Heroe("Sonya", 85, 115);
+$sonya = new Heroe("Sonya", 85, 115, 17);
 
 $heroes = [$uther, $jaina, $sonya];
 $actifHeroe;
 
 // MONSTERS
-$thrall = new Monster("Thrall", 120, 85);
+$thrall = new Monster("Thrall", 120, 85, 21);
 
-$sylvanas = new Monster("Sylvanas", 100, 95);
+$sylvanas = new Monster("Sylvanas", 100, 95, 14);
 
-$illidan = new Monster("Illidan", 90, 120);
+$illidan = new Monster("Illidan", 90, 120, 15);
 
 $monsters = [$thrall, $sylvanas, $illidan];
 $actifMonster;

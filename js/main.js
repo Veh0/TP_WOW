@@ -1,28 +1,66 @@
 // VARIABLES
-
 var heroeHp = $("#heroe .hp");
 var heroeStamina = $("#heroe .stamina");
-var heroeButton = $("#heroe .button");
 var heroeDamage = $("#heroe .damage");
 var heroeName = $("#heroe .name").text();
+var heroeCoord = []
 
 var actifHeroe;
 var heroeItems = [];
 
 var monsterHp = $("#monster .hp");
 var monsterStamina = $("#monster .stamina");
-var monsterButton = $("#monster .button");
 var monsterDamage = $("#monster .damage");
 var monsterName = $("#monster .name").text();
+var monsterCoord = []
 
 
 var actifMonster;
 var monsterItems = [];
 
+var bg = $('#battleground td');
+var player;
+
 /* heroe = 1  && monster = 0 */
 
+function takePlace() {
+    var heroeX = Math.floor(Math.random() * 10)
+    var heroeY = Math.floor(Math.random() * 10)
+    heroeCoord = [heroeX, heroeY]
+
+    var monsterX = Math.floor(Math.random() * 10)
+    var monsterY = Math.floor(Math.random() * 10)
+    monsterCoord = [monsterX, monsterY]
+
+    for (let index = 0; index < bg.length; index++) {
+        let element = bg[index]
+        //console.log(element.dataset)
+        if ((typeof element.dataset.posx !== 'undefined' && element.dataset.posx == heroeX) && (typeof element.dataset.posy !== 'undefined' && element.dataset.posy == heroeY)) {
+            img = document.createElement("img")
+            img.src = "img/"+heroeName+".webp"
+            img.style = "width: 100%; position: absolute"
+            element.appendChild(img)
+        }
+
+        if ((typeof element.dataset.posx !== 'undefined' && element.dataset.posx == monsterX) && (typeof element.dataset.posy !== 'undefined' && element.dataset.posy == monsterY)) {
+            img = document.createElement("img")
+            img.src = "img/"+monsterName+".webp"
+            img.style = "width: 100%; position: absolute"
+            element.appendChild(img)
+        }
+    };
+}
+
+// FONCTION DEROULEMENT DE PARTIE
 function chooseFirstPlayer() {
     let firstPlayer = Math.floor(Math.random() * 2);
+
+    if (firstPlayer == 0) {
+        $('#monster .button').addClass('disable')
+    } else {
+        $('#heroe .button').addClass('disable')
+    }
+
     return firstPlayer;
 }
 
@@ -37,6 +75,19 @@ function hasWeapon(array) {
 
 }
 
+function changePlayer() {
+    if (player == 0) {
+        player = 1
+        $('#monster .button').removeClass('disable')
+        $('#heroe .button').addClass('disable')
+    } else {
+        player = 0
+        $('#heroe .button').removeClass('disable')
+        $('#monster .button').addClass('disable')
+    }
+}
+
+// PLAYERS ACTIONS
 function play() {
 
     let firstPlayer = chooseFirstPlayer();
@@ -134,19 +185,18 @@ function playerDeath(playerCharacter) {
 }
 
 // ACTIONS COMBAT
-function getDamage(playerCharacter, hp, damage, stamina, defense) {
+function getDamage(playerCharacter) {
 
-    let playerItems = []
+    let playerItems = getItems(playerCharacter)
+
     if (playerCharacter == heroeName) {
-        let select = document.querySelectorAll('.fight-heroe-item img')
-        select.forEach(element => {
-            playerItems.push({ [element.dataset.type] : element.name})
-        });
+        hp = heroeHp.text()
+        stamina = heroeStamina.text()
+        damage = monsterDamage.text()
     } else {
-        let select = document.querySelectorAll('.fight-monster-item img')
-        select.forEach(element => {
-            playerItems.push({ [element.dataset.type] : element.name})
-        });
+        hp = monsterHp.text()
+        stamina = monsterStamina.text()
+        damage = heroeDamage.text()
     }
 
     var data = {
@@ -156,7 +206,6 @@ function getDamage(playerCharacter, hp, damage, stamina, defense) {
         'hp' : hp,
         'damage': damage,
         'stamina': stamina,
-        'defense': defense
     }
 
     return $.ajax({
@@ -193,18 +242,19 @@ function getDamage(playerCharacter, hp, damage, stamina, defense) {
     })
 }
 
-function attack(playerCharacter, stamina) {
-    let playerItems = []
+function attack(playerCharacter) {
+    let playerItems = getItems(playerCharacter)
+
     if (playerCharacter == heroeName) {
-        let select = document.querySelectorAll('.fight-heroe-item img')
-        select.forEach(element => {
-            playerItems.push({ [element.dataset.type] : element.name})
-        });
+        stamina = heroeStamina.text()
+        coord = heroeCoord
+        enemyCoord = monsterCoord
+        enemy = monsterName
     } else {
-        let select = document.querySelectorAll('.fight-monster-item img')
-        select.forEach(element => {
-            playerItems.push({ [element.dataset.type] : element.name})
-        });
+        stamina = monsterStamina.text()
+        coord = monsterCoord
+        enemyCoord = heroeCoord
+        enemy = heroeName
     }
 
     var data = {
@@ -219,34 +269,27 @@ function attack(playerCharacter, stamina) {
         url: 'main.php',
         data: data
     }).done(function (result) {
+        result = JSON.parse(result)
+        var error = result["error"]
+        var stamina = result["stamina"]
         if (playerCharacter == heroeName) {
-            heroeStamina.text(result)
+            heroeStamina.text(stamina)
         } else {
-            monsterStamina.text(result)
+            monsterStamina.text(stamina)
         }
     })
 }
 
 function eat(playerCharacter, stamina) {
     
-    let playerItems = []
-    if (playerCharacter == heroeName) {
-        let select = document.querySelectorAll('.fight-heroe-item img')
-        select.forEach(element => {
-            playerItems.push({ [element.dataset.type] : element.name})
-        });
-    } else {
-        let select = document.querySelectorAll('.fight-monster-item img')
-        select.forEach(element => {
-            playerItems.push({ [element.dataset.type] : element.name})
-        });
-    }
+    let playerItems = getItems(playerCharacter)
+    
 
     var data = {
             'action': 'ajaxEat',
             'player': playerCharacter,
             'playerItems': JSON.stringify(playerItems),
-            'stamina': stamina
+            'stamina': stamina.text()
         }
     
     return $.ajax({
@@ -254,27 +297,260 @@ function eat(playerCharacter, stamina) {
         url: 'main.php',
         data: data
     }).done(function (result) {
+        result = JSON.parse(result)
+        var error = result["error"]
+        var stamina = result["stamina"]
+
         if (playerCharacter == heroeName) {
-            heroeStamina.text(result)
+            heroeStamina.text(stamina)
         } else {
-            monsterStamina.text(result)
+            monsterStamina.text(stamina)
         }
+
+        if (error == 1) {
+            M.toast({html: "You are full of energy", displayLength: 2000})
+        } else {
+            changePlayer()
+        }
+
+        
     })
 }
 
-function changeItem(playerCharacter, type, item) {
-    let playerItems = []
+function sleep(playerCharacter, stamina, hp) {
+    
+    return $.ajax({
+        method: 'post',
+        url: 'main.php',
+        data: {
+            'action': 'ajaxSleep',
+            'player': playerCharacter,
+            'stamina': stamina.text(),
+            'hp': hp.text()
+        }
+    }).done(function(result) {
+        result = JSON.parse(result)
+        var error = result["error"]
+        var stamina = result["stamina"]
+        var hp = result["hp"]
+
+        if (playerCharacter == heroeName && error != 3) {
+            heroeStamina.text(stamina)
+            heroeHp.text(hp)
+            changePlayer()
+        } else if (playerCharacter == monsterName && error != 3){
+            monsterStamina.text(stamina)
+            monsterHp.text(hp)
+            changePlayer()
+        }
+
+        if (error == 1) {
+            M.toast({html: "You are full of energy", displayLength: 2000})
+        }
+
+        if (error == 2) {
+            M.toast({html: "You are totally cured", displayLength: 2000})
+        }
+
+        if (error == 3) {
+            M.toast({html: "You are totally cured, you wake up", displayLength: 2000})
+        }
+
+        
+    })
+}
+
+function run(playerCharacter) {
+    var coord;
+    
+
     if (playerCharacter == heroeName) {
-        let select = document.querySelectorAll('.fight-heroe-item img')
-        select.forEach(element => {
-            playerItems.push({ [element.dataset.type] : element.name})
-        });
+        coord = heroeCoord
+        stamina = heroeStamina.text()
+        enemy = monsterName
+        enemyCoord = monsterCoord
     } else {
-        let select = document.querySelectorAll('.fight-monster-item img')
-        select.forEach(element => {
-            playerItems.push({ [element.dataset.type] : element.name})
-        });
+        coord = monsterCoord
+        stamina = monsterStamina.text()
+        enemy = heroeName
+        enemyCoord = heroeCoord
     }
+
+    items = getItems(playerCharacter)
+
+    let data = {
+        'action': 'ajaxRunAway',
+        'player': playerCharacter,
+        'originCoordinate': coord,
+        'enemy': enemy,
+        'stamina': stamina,
+        'playerItems' : JSON.stringify(items),
+        'enemyCoord': enemyCoord
+    }
+
+    return $.ajax({
+        method: 'post',
+        url: 'main.php',
+        data: data
+    }).done(function(result) {
+        result = JSON.parse(result)
+        var error = result["error"];
+        var newCoord = result["coord"];
+        var stamina = result["stamina"];
+        
+        if (playerCharacter == heroeName) {
+            heroeStamina.text(stamina)
+            for (let index = 0; index < bg.length; index++) {
+                let element = bg[index]
+                //console.log(element.dataset)
+                if ((typeof element.dataset.posx !== 'undefined' && element.dataset.posx == newCoord[0]) && (typeof element.dataset.posy !== 'undefined' && element.dataset.posy == newCoord[1]) && error == 0) {
+                        img = document.createElement("img")
+                        img.src = "img/"+heroeName+".webp"
+                        img.style = "width: 100%; position: absolute"
+                        element.appendChild(img)
+                        heroeCoord = newCoord
+                    
+                }
+            }
+        } else {
+            monsterStamina.text(stamina)
+            for (let index = 0; index < bg.length; index++) {
+                let element = bg[index]
+                if ((typeof element.dataset.posx !== 'undefined' && element.dataset.posx == newCoord[0]) && (typeof element.dataset.posy !== 'undefined' && element.dataset.posy == newCoord[1]) && error == 0) {
+                        img = document.createElement("img")
+                        img.src = "img/"+monsterName+".webp"
+                        img.style = "width: 100%; position: absolute"
+                        element.appendChild(img)
+                        monsterCoord = newCoord
+                }
+            }
+        }
+
+        if(error == 0) {
+            for (let index = 0; index < bg.length; index++) {
+                const element = bg[index];
+                if ((typeof element.dataset.posx !== 'undefined' && element.dataset.posx == coord[0]) && (typeof element.dataset.posy !== 'undefined' && element.dataset.posy == coord[1])) {
+                    element.removeChild(element.childNodes[1])
+                }
+            }
+            changePlayer();
+        }
+
+        if(error == 1) {
+            M.toast({html: "You are completly exhaustive", displayLength: 2000})
+        } 
+    })
+}
+
+function move(playerCharacter, direction) {
+    var coord;
+    
+
+    if (playerCharacter == heroeName) {
+        coord = heroeCoord
+        stamina = heroeStamina.text()
+        enemy = monsterName
+        enemyCoord = monsterCoord
+    } else {
+        coord = monsterCoord
+        stamina = monsterStamina.text()
+        enemy = heroeName
+        enemyCoord = heroeCoord
+    }
+
+    items = getItems(playerCharacter)
+
+    let data = {
+        'action': 'ajaxMove',
+        'player': playerCharacter,
+        'originCoordinate': coord,
+        'direction': direction,
+        'enemy': enemy,
+        'stamina': stamina,
+        'playerItems' : JSON.stringify(items),
+        'enemyCoord': enemyCoord
+    }
+
+    console.log(data)
+
+    return $.ajax({
+        method: 'post',
+        url: 'main.php',
+        data: data
+    }).done(function(result) {
+        result = JSON.parse(result)
+        var error = result["error"];
+        var newCoord = result["coord"];
+        var stamina = result["stamina"];
+        
+        if (playerCharacter == heroeName) {
+            heroeStamina.text(stamina)
+            for (let index = 0; index < bg.length; index++) {
+                let element = bg[index]
+                //console.log(element.dataset)
+                if ((typeof element.dataset.posx !== 'undefined' && element.dataset.posx == newCoord[0]) && (typeof element.dataset.posy !== 'undefined' && element.dataset.posy == newCoord[1]) && error == 0) {
+                        img = document.createElement("img")
+                        img.src = "img/"+heroeName+".webp"
+                        img.style = "width: 100%; position: absolute"
+                        element.appendChild(img)
+                        heroeCoord = newCoord
+                        $("#heroe .button.move").addClass('disable')
+                }
+            }
+            
+        } else {
+            monsterStamina.text(stamina)
+            for (let index = 0; index < bg.length; index++) {
+                let element = bg[index]
+                if ((typeof element.dataset.posx !== 'undefined' && element.dataset.posx == newCoord[0]) && (typeof element.dataset.posy !== 'undefined' && element.dataset.posy == newCoord[1]) && error == 0) {
+                        img = document.createElement("img")
+                        img.src = "img/"+monsterName+".webp"
+                        img.style = "width: 100%; position: absolute"
+                        element.appendChild(img)
+                        monsterCoord = newCoord
+                        $("#monster .button.move").addClass('disable')
+                }
+            }
+            
+        }
+        if(error == 0) {
+            for (let index = 0; index < bg.length; index++) {
+                const element = bg[index];
+                if ((typeof element.dataset.posx !== 'undefined' && element.dataset.posx == coord[0]) && (typeof element.dataset.posy !== 'undefined' && element.dataset.posy == coord[1])) {
+                    element.removeChild(element.childNodes[1])
+                }
+            }
+        } else if(error == 2) {
+            M.toast({html: "You are completly exhaustive", displayLength: 2000})
+        } else {
+            M.toast({html: "Something is blocking the way", displayLength: 2000})
+        }
+        
+    })
+}
+
+function getItems(playerCharacter) {
+    playerItems = []
+    
+    if (playerCharacter == heroeName) {
+        var items = $('.fight-heroe-item img')
+    } else {
+        var items = $('.fight-monster-item img')
+    }
+
+    console.log(items)
+
+    for (let index = 0; index < items.length; index++) {
+        const element = items[index];
+        playerItems.push({ [element.dataset.type] : element.name})
+    }
+
+    return playerItems
+}
+
+function changeItem(playerCharacter, type, item) {
+    
+    var playerItems = getItems(playerCharacter)
 
     var data = {
         'action': 'ajaxChangeItem',
@@ -298,21 +574,22 @@ function changeItem(playerCharacter, type, item) {
                 $("#monster .weaponName").text(result["name"])
                 $("#monster .damage").text(result["damage"])
             }
+        } else if (type == "shield") {
+            if (playerCharacter == heroeName) {
+                $("#heroe .shieldName").text(result["name"])
+                $("#heroe .percentDefense").text(result["percentDefense"])
+            } else {
+                $("#monster .shieldName").text(result["name"])
+                $("#monster .damage").text(result["percentDefense"])
+            }
         }
     })
 }
 
-// chooseFirstPlayer()
+player = chooseFirstPlayer()
 
-monsterButton.click(function(e) {
-    e.preventDefault();
-    play()
-})
 
-heroeButton.click(function(e) {
-    e.preventDefault();
-    play()
-})
+takePlace();
 
 $(".select-heroe").click(function(e) {
     e.preventDefault();
@@ -415,9 +692,35 @@ $("#fight button").click(function(e) {
     
 })
 
-$("#playBtn").click(function(e) {
+// HEROE EVENT ACTIONS
+$("#heroe .move").click(function(e){
     e.preventDefault();
-    play()
+
+    move(heroeName, $(this)[0].dataset.move)
+})
+
+$("#heroe .eat").click(function(e) {
+    e.preventDefault();
+
+    eat(heroeName, heroeStamina)
+})
+
+$("#heroe .sleep").click(function(e) {
+    e.preventDefault();
+
+    sleep(heroeName, heroeStamina, heroeHp)
+})
+
+$("#heroe .run").click(function(e) {
+    e.preventDefault()
+
+    run(heroeName)
+})
+
+$("#heroe .attack").click(function(e) {
+    e.preventDefault()
+
+    attack(heroeName)
 })
 
 $(".fight-heroe-item").click(function(e) {
@@ -430,6 +733,37 @@ $(".fight-heroe-item").click(function(e) {
     console.log(item)
 
     changeItem(heroeName, itemType, itemName)
+})
+
+// MONSTER EVENT ACTIONS
+$("#monster .move").click(function(e){
+    e.preventDefault();
+
+    move(monsterName, $(this)[0].dataset.move)
+})
+
+$("#monster .eat").click(function(e) {
+    e.preventDefault();
+
+    eat(monsterName, monsterStamina)
+})
+
+$("#monster .sleep").click(function(e) {
+    e.preventDefault();
+
+    sleep(monsterName, monsterStamina, monsterHp)
+})
+
+$("#monster .run").click(function(e) {
+    e.preventDefault()
+
+    run(monsterName)
+})
+
+$("#monster .attack").click(function(e) {
+    e.preventDefault()
+
+    attack(monsterName)
 })
 
 $(".fight-monster-item").click(function(e) {

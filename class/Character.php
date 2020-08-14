@@ -4,16 +4,24 @@ abstract class Character {
 
     public $name;
     public $hp;
+    public $hpMax;
     public $stamina;
+    public $staminaMax;
+    public $strength;
+    public $charge;
     public $inventory = [];
+    public $coordinate = [];
     public $weapon;
     public $shield;
     public $food;
 
-    public function __construct($name, $hp, $stamina) {
+    public function __construct($name, $hp, $stamina, $strength) {
         $this->name = $name;
         $this->hp = $hp;
+        $this->hpMax = $hp;
         $this->stamina = $stamina;
+        $this->staminaMax = $stamina;
+        $this->strength = $strength;
         $this->weapon = "No weapon";
         $this->shield = "No shield";
         $this->food = "No food";
@@ -57,6 +65,10 @@ abstract class Character {
         }
     } 
 
+    public function setCoordinate(array $coordinate) {
+        $this->coordinate = $coordinate;
+    }
+
     // GETTERS
     public function getName() {
         return $this->name;
@@ -66,8 +78,24 @@ abstract class Character {
         return $this->hp;
     }
 
+    public function getHpMax() {
+        return $this->hpMax;
+    }
+
     public function getStamina() {
         return $this->stamina;
+    }
+
+    public function getStaminaMax() {
+        return $this->staminaMax;
+    }
+
+    public function getStrength() {
+        return $this->strength;
+    }
+
+    public function getCharge() {
+        return $this->charge;
     }
 
     public function getWeapon() {
@@ -86,10 +114,14 @@ abstract class Character {
         return $this->inventory;
     }
 
+    public function getCoordinate() {
+        return $this->coordinate;
+    }
+
     // FUNCTIONS
     public function attack() {
         $stamina = $this->getStamina();
-        $stamina = $stamina - ($this->weapon->getHeight() * $this->weapon->getWeight())/10000;
+        if($this->weapon != "No weapon") $stamina = round($stamina - ($this->weapon->getHeight() * $this->weapon->getWeight())/(1000 * $this->getStrength()), 1);
         $this->setStamina($stamina); 
 
     }
@@ -98,8 +130,43 @@ abstract class Character {
         $this->hp -= $damage;
     }
 
+    public function sleep() {
+        $this->hp += ($this->getHpMax()*10)/100;
+        $this->stamina += ($this->getStaminaMax()*5)/100;
+    }
+
+    public function move($direction, $charge) {
+        
+        $x = $this->getCoordinate()[0];
+        $y = $this->getCoordinate()[1];
+        
+        switch ($direction) {
+            case 'nord':
+                # code...
+                $y = $y + 1;
+            break;    
+            case 'sud':
+                # code...
+                $y = $y - 1;
+            break;  
+            case 'ouest':
+                # code...
+                $x = $x - 1;
+            break; 
+            case 'est':
+                # code...
+                $x = $x + 1;
+            break;   
+        }
+
+        $stamina = $this->getStamina();
+        $this->setStamina(round($stamina - $charge/(10 * $this->getStrength()), 1));
+
+        $this->setCoordinate([$x, $y]);
+    }
+
     public function eat() {
-        $this->stamina += $this->food->stamina;
+        if($this->food != "No food") $this->stamina += $this->food->stamina;
     }
 
     public function defense($damage) {
@@ -110,7 +177,7 @@ abstract class Character {
             $damage = $damage - $damageReduce;
         }
         $stamina = $this->getStamina();
-        $this->getShield() == "No shield" ? $stamina = $stamina : $this->setStamina($stamina - $this->shield->getWeight()/100); 
+        $this->getShield() == "No shield" ? $stamina = $stamina : $this->setStamina(round($stamina - $this->shield->getWeight()/(100 * $this->getStrength()), 1)); 
         $this->getDamage($damage);
     }
 

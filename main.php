@@ -8,13 +8,13 @@ include_once('init.php');
 if(isset($_POST['action']) && !empty($_POST['action'])) {
     $action = $_POST['action'];
     if (isset($_POST['player'])) $player = $GLOBALS[strtolower($_POST['player'])];
+    if (isset($_POST['enemy'])) $enemy = $GLOBALS[strtolower($_POST['enemy'])];
 
     if (isset($_POST["player"]) && isset($_POST["playerItems"])) fight($_POST["player"], json_decode($_POST["playerItems"], true));
-
     
     switch($action) {
         case 'ajaxGetDamage' : 
-            ajaxGetDamage($player, $_POST['hp'],$_POST['damage'], $_POST['stamina'], $_POST['defense']);
+            ajaxGetDamage($player, $_POST['hp'],$_POST['damage'], $_POST['stamina']);
         break;
         case 'ajaxAttack':
             ajaxAttack($player, $_POST['stamina']);
@@ -27,6 +27,16 @@ if(isset($_POST['action']) && !empty($_POST['action'])) {
         break;
         case 'ajaxChangeItem':
             ajaxChangeItem($player, $_POST['type'], $_POST['item']);
+        break;
+        case 'ajaxMove':
+            ajaxMove($player, $enemy, $_POST["enemyCoord"], $_POST["originCoordinate"], $_POST["direction"], $_POST["stamina"]);
+        break;
+        case 'ajaxSleep':
+            ajaxSleep($player, $_POST["stamina"], $_POST["hp"]);
+        break;
+        case 'ajaxRunAway':
+            ajaxRunAway($player, $enemy, $_POST["enemyCoord"], $_POST["originCoordinate"], $_POST["stamina"]);
+        break;
         // ...etc...
     }
 }
@@ -36,30 +46,182 @@ function ajaxEat($character, $stamina) {
 
     $character->eat();
 
-    echo $character->getStamina();
+    if ($character->getStamina() > $character->getStaminaMax()) {
+        # code...
+        $tab["error"] = 1;
+        $character->setStamina($character->getStaminaMax());
+    } else {
+        $tab["error"] = 0;
+    }
+
+    $tab["stamina"] = $character->getStamina();
+
+    echo json_encode($tab);
+}
+
+function ajaxSleep($character, $stamina, $hp) {
+    $character->setStamina($stamina);
+    $character->setHp($hp);
+
+    $character->sleep();
+
+    if($character->getStamina() >= $character->getStaminaMax() && $character->getHp() >= $character->getHpMax()) {
+        $tab["error"] = 3;
+        $character->setStamina($character->getStaminaMax());
+        $character->setHp($character->getHpMax());
+    } else if($character->getHp() > $character->getHpMax()) {
+        $tab["error"] = 2;
+        $character->setHp($character->getHpMax());
+    } else if ($character->getStamina() > $character->getStaminaMax()) {
+        # code...
+        $tab["error"] = 1;
+        $character->setStamina($character->getStaminaMax());
+    } else {
+        $tab["error"] = 0;
+    }
+
+    $tab["stamina"] = $character->getStamina();
+    $tab["hp"] = $character->getHp();
+
+    echo json_encode($tab);
 }
 
 function ajaxAttack($character, $stamina) {
     $character->setStamina($stamina);
 
+    
     $character->attack();
 
     echo $character->getStamina();
 }
 
-function ajaxGetDamage($character, $hp, $damage, $stamina, $defense) {
+function ajaxMove($character, $enemy, $enemyCoord, $originCoord, $direction, $stamina) {
+        
+
+    $character->setCoordinate($originCoord);
+    $enemy->setCoordinate($enemyCoord);
+
+    $character->setStamina($stamina);
+
+    $charge = 0;
+        for ($i=0; $i < count($character->getInventory()); $i++) { 
+            # code...
+            $item = $character->getInventory()[$i];
+            foreach($item as $key => $value) {
+                if($key == "food") continue;
+                $charge += $GLOBALS[strtolower($value)]->getWeight();
+            }
+        }
+
+    $character->move($direction, $charge);
+
+    $array = array_diff_assoc($character->getCoordinate(), $enemy->getCoordinate());
+
+    if (empty($array) || $character->getCoordinate()[0] == 10 || $character->getCoordinate()[0] < 0 || $character->getCoordinate()[1] == 10 || $character->getCoordinate()[1] < 0) {
+        # code...
+        $tab["error"] = 1;
+        $character->setCoordinate($originCoord);
+        $character->setStamina($stamina);
+    } else {
+        $tab["error"] = 0;
+    }
+
+    if($character->getStamina() < 0) {
+        $tab["error"] = 2;
+        $character->setCoordinate($originCoord);
+        $character->setStamina($stamina);
+    }
+
+    $tab["stamina"] = $character->getStamina();
+
+    $tab["coord"] = $character->getCoordinate();
+
+    echo json_encode($tab);
+}
+
+function ajaxRunAway($character, $enemy, $enemyCoord, $originCoord, $stamina) {
+
+    $character->setCoordinate($originCoord);
+    $enemy->setCoordinate($enemyCoord);
+
+    $character->setStamina($stamina);
+
+    $charge = 0;
+        for ($i=0; $i < count($character->getInventory()); $i++) { 
+            # code...
+            $item = $character->getInventory()[$i];
+            foreach($item as $key => $value) {
+                if($key == "food") continue;
+                $charge += $GLOBALS[strtolower($value)]->getWeight();
+            }
+        }
+
+    $arrayDir = ["nord", "sud", "est", "ouest"];
+
+    $error = 1;
+    $i = 0;
+    while($error == 1) {
+        $direction = $arrayDir[$i];
+        $character->move($direction, $charge);
+
+        $array = array_diff_assoc($character->getCoordinate(), $enemy->getCoordinate());
+
+        if (!empty($array) && $character->getCoordinate()[0] < 10 && $character->getCoordinate()[0] > 0 && $character->getCoordinate()[1] < 10 && $character->getCoordinate()[1] > 0) {
+            # code...
+            $character->move($direction, $charge);
+            $array = array_diff_assoc($character->getCoordinate(), $enemy->getCoordinate());
+            
+            if (!empty($array) && $character->getCoordinate()[0] < 10 && $character->getCoordinate()[0] > 0 && $character->getCoordinate()[1] < 10 && $character->getCoordinate()[1] > 0) {
+                $error = 0;
+            } else {
+                $character->setCoordinate($originCoord);
+                $character->setStamina($stamina);
+                $error = 1;
+                $i++;
+            }
+        } else {
+            $character->setCoordinate($originCoord);
+            $character->setStamina($stamina);
+            $error = 1;
+            $i++;
+        }
+
+    }
+
+    $tab["error"] = 0;
+
+    if($character->getStamina() < 0) {
+        $tab["error"] = 1;
+        $character->setCoordinate($originCoord);
+        $character->setStamina($stamina);
+    }
+
+    $tab["coord"] = $character->getCoordinate();
+    $tab["stamina"] = $character->getStamina();
+
+    echo json_encode($tab);
+}
+
+
+function ajaxGetDamage($character, $hp, $damage, $stamina) {
     $character->setHp($hp);
     $character->setStamina($stamina);
 
     $tab = [];
 
-    if ($defense) {
-        # code...
-        $character->defense($damage);
-    } else {
-        # code...
+    # code...
+    $character->defense($damage);
+
+    $tab["error"] = 0;
+
+    if($character->getStamina() < 0) {
+        $character->setHp($hp);
+        $character->setStamina($stamina);
+        $tab["error"] = 1;
+
         $character->getDamage($damage);
     }
+
     
     $tab["hp"] = round($character->getHP());
     $tab["stamina"] = $character->getStamina();
@@ -88,6 +250,8 @@ function ajaxChangeItem($character, $type, $item) {
             # code...
             $shield = $GLOBALS[strtolower($item)];
             $character->setShield($shield);
+            $tab["name"] = $shield->getName();
+            $tab["percentDefense"] = $shield->getPercentDefense();
         break;
         case 'food':
             # code...
@@ -99,10 +263,13 @@ function ajaxChangeItem($character, $type, $item) {
     
 }
 
-function fight($player, $playerItems) {
+function fight($character, $playerItems) {
 
-
-    $character = $GLOBALS[strtolower($player)];
+    if (!is_object($character)) {
+        # code...
+        $character = $GLOBALS[strtolower($character)];
+    }
+    
     $character->setInventory($playerItems, "add");
     foreach ($playerItems as $key => $value) {
         # code...
@@ -130,6 +297,6 @@ function fight($player, $playerItems) {
     }
 
     
-    }
+}
 
     

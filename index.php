@@ -115,7 +115,7 @@
             <input type="hidden" name="monsterHp">
             <input type="hidden" name="monsterStamina">
             <input type="hidden" name="monsterItems">
-            <button class="button">Fight !</a>
+            <button class="button" style="width:100%; margin-bottom:2%">Fight !</a>
         </form>
     </div>
 
